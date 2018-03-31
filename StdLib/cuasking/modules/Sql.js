@@ -4,6 +4,8 @@ class Sql {
   constructor (host, name, pw) {
     this._dets = {host, name, pw};
     this._connect ();
+
+    this._waiting = [ ];
   }
 
 
@@ -20,16 +22,20 @@ class Sql {
         join Answer on QuestionId`).then (fulfill, reject);
   }
   getQuestion (questionId) {
-    return this._query (`select * from Question where QuestionId=${questionId}`);
+    return this._query (`select * from Question join User on User.UserId where QuestionId=${questionId}`);
   }
   getQuestionByText (questionText) {
-    return this._query (`select * from Question where QuestionText=${questionText}`);
+    return this._query (`select * from Question join User on User.UserId where QuestionText=${questionText}`);
   }
 
   getAnswers (questionId) {
     return this._query (`select * from Answer where QuestionId=${questionId}`);
   }
 
+  getUserId (username) {
+    return this._query (`select UserId from User where username=${username}`);
+  }
+  
   users (username) {
     return this._query (`select * from User where username=${username}`);
   }
@@ -41,22 +47,38 @@ class Sql {
   postAnswer (answer, questionId, date) {
     return this._query (`insert into Answer values (NULL, ${questionId}, ${answer})`);
   }
-  postUser (username, userId) {
+  postUser (username) {
     return this._query (`insert into User values (NULL, ${username})`);
   }
 
   _query (query) {
     return new Promise ((fulfill, reject) => {
-      this._con.query (query, (err, res) => {
-        if (err) reject (err);
-        else fulfill (res);
-      });
+      var run = () => {
+        console.log ("HI GEORGIE");
+        this._con.query (query, (err, res) => {
+          console.log ("RESULT: ", res);
+
+          if (err) reject (err);
+          else fulfill (res);
+        });
+      }
+
+      console.log ("./");
+
+      if (!this._con)
+        this._waitForConnection().then (run, reject);
+      else run();
+    });
+  }
+
+  _waitForConnection () {
+    return new Promise ((fulfill, reject) => {
+      this._waiting.push (fulfill);
     });
   }
 
   _connect () {
     return new Promise ((fulfill, reject) => {
-      console.log (this._dets.host, this._dets.name, this._dets.pw);
       var con = mysql.createConnection({
         host: this._dets.host,
         user: this._dets.name,
@@ -64,13 +86,16 @@ class Sql {
         database: "Cuasking"
       });
 
-      console.log ("Connecting\n");
-      
-      con.connect ().then ((err) => {
+      console.log ("Hi?");
+
+      con.connect ((err) => {
         if (err) reject (err);
         else {
-          console.log ("Connected to ", con);
           this._con = con;
+
+          // fulfill waiting processes
+          for (var f of this._waiting) f();
+
           fulfill ();
         }
       });

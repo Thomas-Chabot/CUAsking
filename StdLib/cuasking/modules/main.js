@@ -15,7 +15,7 @@ class Main {
   static init () {
     this._sql;
   }
-  
+
   static get _sql () {
     if (this._sqlObj) return this._sqlObj;
     this._sqlObj = new Sql (host, user, password);
@@ -26,6 +26,7 @@ class Main {
     return this._sql.getQuestionsByMostRecent (20, offset);
   }
   static getQuestion (question) {
+    console.log ("Getting question by text");
     return this._sql.getQuestionByText (question);
   }
   static postQuestion (question, userId) {
@@ -55,10 +56,19 @@ class Main {
   }
 
   static userExists (username) {
-    return this._sql.users (username).length > 0;
+    return new Promise ((fulfill, reject) => {
+      this._sql.users (username).then ((res) => {
+        fulfill (res.length > 0);
+      }, reject);
+    });
   }
+
   static addUser (username) {
     return this._sql.postUser (username);
+  }
+
+  static getUserId (username) {
+    return this._sql.getUserId (username);
   }
 }
 
