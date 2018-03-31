@@ -1,0 +1,25 @@
+mysql> USE Cuasking
+Database changed
+
+mysql> create table User (
+    -> UserId int AUTO_INCREMENT PRIMARY KEY,
+    -> Username varchar (20)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table Question (
+    -> QuestionId int AUTO_INCREMENT PRIMARY KEY,
+    -> QuestionText text,
+    -> UserId int NOT NULL,
+    -> Category varchar (30),
+    -> foreign key (UserId) references User (UserId)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table Answer (
+    -> AnswerId int AUTO_INCREMENT PRIMARY KEY,
+    -> QuestionId int NOT NULL,
+    -> AnswerText text,
+    -> foreign key (QuestionId) references Question (QuestionId)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
