@@ -1,5 +1,5 @@
 var calculateBest = require ("../modules/calculateBest.js");
-var getCategory = require ("../modules/getCategory.js");
+var getCategory = require ("../modules/getCategory.js").get;
 
 var Sql = require ("./Sql.js").Sql;
 
@@ -26,7 +26,6 @@ class Main {
     return this._sql.getQuestionsByMostRecent (20, offset);
   }
   static getQuestion (question) {
-    console.log ("Getting question by text");
     return this._sql.getQuestionByText (question);
   }
   static postQuestion (question, userId) {
@@ -44,6 +43,7 @@ class Main {
       }, reject);
     });
   }
+  
   static myQuestions (userId) {
     return this._sql.getQuestionsByUserId (userId);
   }
@@ -68,7 +68,11 @@ class Main {
   }
 
   static getUserId (username) {
-    return this._sql.getUserId (username);
+    return new Promise ((fulfill, reject) => {
+      this._sql.getUserId (username).then ((obj)=>{
+        fulfill (obj [0].UserId);
+      }, reject);
+    });
   }
 }
 

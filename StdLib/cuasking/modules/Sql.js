@@ -17,15 +17,16 @@ class Sql {
   }
 
   getQuestionsByUserId (userId) {
-    return this._query (`select QuestionId from
-        (select * from Question where UserId=${userId})
-        join Answer on QuestionId`).then (fulfill, reject);
+    console.log (userId);
+    return this._query (`select * from
+        (select * from Question where UserId=${userId}) as Questions
+        join Answer on Questions.QuestionId where Answer.QuestionId = Questions.QuestionId`);
   }
   getQuestion (questionId) {
     return this._query (`select * from Question join User on User.UserId where QuestionId=${questionId}`);
   }
   getQuestionByText (questionText) {
-    return this._query (`select * from Question join User on User.UserId where QuestionText=${questionText}`);
+    return this._query (`select * from Question join User on User.UserId where QuestionText='${questionText}'`);
   }
 
   getAnswers (questionId) {
@@ -33,37 +34,33 @@ class Sql {
   }
 
   getUserId (username) {
-    return this._query (`select UserId from User where username=${username}`);
+    return this._query (`select UserId from User where username='${username}'`);
   }
-  
+
   users (username) {
     return this._query (`select * from User where username=${username}`);
   }
 
 
   postQuestion (question, userId, category, date) {
-    return this._query (`insert into Question values (NULL, ${question}, ${userId}, ${category})`);
+    return this._query (`insert into Question values (NULL, '${question}', ${userId}, '${category}', '${date}')`);
   }
   postAnswer (answer, questionId, date) {
-    return this._query (`insert into Answer values (NULL, ${questionId}, ${answer})`);
+    return this._query (`insert into Answer values (NULL, ${questionId}, '${answer}', '${date}')`);
   }
   postUser (username) {
-    return this._query (`insert into User values (NULL, ${username})`);
+    return this._query (`insert into User values (NULL, '${username}')`);
   }
 
   _query (query) {
     return new Promise ((fulfill, reject) => {
       var run = () => {
-        console.log ("HI GEORGIE");
         this._con.query (query, (err, res) => {
-          console.log ("RESULT: ", res);
 
           if (err) reject (err);
           else fulfill (res);
         });
       }
-
-      console.log ("./");
 
       if (!this._con)
         this._waitForConnection().then (run, reject);
@@ -85,8 +82,6 @@ class Sql {
         password: this._dets.pw,
         database: "Cuasking"
       });
-
-      console.log ("Hi?");
 
       con.connect ((err) => {
         if (err) reject (err);

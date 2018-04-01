@@ -9,8 +9,13 @@ var resp = require ("../../modules/respond.js").respond;
 module.exports = (username = "", questionId = 0, context, callback) => {
   resp ({username}, ()=>{
     return new Promise ((fulfill, reject) => {
+      console.log ("Hello Georgie.");
       main.getUserId (username).then ((id) => {
-        main.myQuestions (id).then (fulfill, reject);
+        console.log ("Ohai, Georgie.");
+        main.myQuestions (id).then ((...a)=>{
+          console.log ("All done?");
+          fulfill (...a);
+        }, reject);
       });
     });
   }, callback);
