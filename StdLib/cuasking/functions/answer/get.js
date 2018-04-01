@@ -1,7 +1,7 @@
 /**
-* Gets a question from the database
-* @param {string} name Who you're saying hello to
-* @returns {string}
+* Gets all answers for a given question
+* @param {int} questionId The question to get the answers for
+* @returns {Array of Object} An array of Answer objects.
 */
 var main = require ("../../modules/main.js").Main;
 var resp = require ("../../modules/respond.js").respond;

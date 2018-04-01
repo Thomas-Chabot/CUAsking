@@ -32,7 +32,7 @@ class Main {
     return new Promise ((fulfill, reject) => {
       this._sql.getQuestionByText (question).then ((data) => {
         if (data.length > 0)
-          calculateBest (question).then (fulfill, reject);
+          this._sql.getBestAnswer (data[0].QuestionId).then (fulfill, reject);
         else{
           getCategory (question).then ((cat) => {
             this._sql.postQuestion (question, userId, cat, getDate()).then ((results)=>{
@@ -43,13 +43,13 @@ class Main {
       }, reject);
     });
   }
-  
+
   static myQuestions (userId) {
     return this._sql.getQuestionsByUserId (userId);
   }
 
-  static postAnswer (answerText, qId) {
-    return this._sql.postAnswer (answerText, qId, getDate());
+  static postAnswer (answerText, qId, userId) {
+    return this._sql.postAnswer (answerText, qId, userId, getDate());
   }
   static getAnswers (questionId) {
     return this._sql.getAnswers (questionId);

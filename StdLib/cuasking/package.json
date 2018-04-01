@@ -1,10 +1,11 @@
 {
   "name": "cuasking",
-  "version": "0.0.7",
+  "version": "0.1.7",
   "description": "",
   "author": "Wiggles <seanhodges01@hotmail.com>",
   "main": "functions/__main__.js",
   "dependencies": {
+    "indico.io": "^0.10.5",
     "mysql": "^2.15.0",
     "python-shell": "^0.5.0"
   },

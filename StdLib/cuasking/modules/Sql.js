@@ -17,18 +17,20 @@ class Sql {
   }
 
   getQuestionsByUserId (userId) {
-    console.log (userId);
     return this._query (`select * from
         (select * from Question where UserId=${userId}) as Questions
         join Answer on Questions.QuestionId where Answer.QuestionId = Questions.QuestionId`);
   }
   getQuestion (questionId) {
-    return this._query (`select * from Question join User on User.UserId where QuestionId=${questionId}`);
+    return this._query (`select * from Question join User on User.UserId where User.UserId=Question.UserId and QuestionId=${questionId} `);
   }
   getQuestionByText (questionText) {
     return this._query (`select * from Question join User on User.UserId where QuestionText='${questionText}'`);
   }
 
+  getBestAnswer (questionId) {
+    return this._query (`select * from Answer where QuestionId=${questionId} LIMIT 1`);
+  }
   getAnswers (questionId) {
     return this._query (`select * from Answer where QuestionId=${questionId}`);
   }
@@ -45,8 +47,8 @@ class Sql {
   postQuestion (question, userId, category, date) {
     return this._query (`insert into Question values (NULL, '${question}', ${userId}, '${category}', '${date}')`);
   }
-  postAnswer (answer, questionId, date) {
-    return this._query (`insert into Answer values (NULL, ${questionId}, '${answer}', '${date}')`);
+  postAnswer (answer, questionId, userId, date) {
+    return this._query (`insert into Answer values (NULL, ${questionId}, '${answer}', ${userId}, '${date}')`);
   }
   postUser (username) {
     return this._query (`insert into User values (NULL, '${username}')`);
